@@ -44,7 +44,7 @@ const FileUpload: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://server-hanghoa.onrender.com:10000",
+        "https://server-hanghoa.onrender.com:10000/upload",
         formData,
         {
           headers: {
