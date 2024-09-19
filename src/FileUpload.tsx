@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import * as XLSX from "xlsx"; // Import XLSX library
+import * as XLSX from 'xlsx';
 
 const FileUpload: React.FC = () => {
   const [files, setFiles] = useState({
@@ -14,6 +14,22 @@ const FileUpload: React.FC = () => {
     if (files && files.length > 0) {
       setFiles((prev) => ({ ...prev, [name]: files[0] }));
     }
+  };
+
+  const downloadFile = (workbook: XLSX.WorkBook, fileName: string) => {
+    // Write workbook to binary string
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    // Create a Blob from the binary string
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+    // Create a link and trigger the download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -31,20 +47,26 @@ const FileUpload: React.FC = () => {
         },
       });
 
-      // Create XLSX file from the allResults JSON
-      const allWorkbook = XLSX.utils.book_new();
-      const allWorksheet = XLSX.utils.json_to_sheet(response.data.allResults);
-      XLSX.utils.book_append_sheet(allWorkbook, allWorksheet, "All Results");
-      XLSX.writeFile(allWorkbook, "all_results.xlsx");
+      const { allResults, groupedResults } = response.data;
 
-      // Create XLSX file from the groupedResults JSON
-      console.log(response.data.groupedResults)
-      const groupedWorkbook = XLSX.utils.book_new();
-      const groupedWorksheet = XLSX.utils.json_to_sheet(response.data.groupedResults);
-      XLSX.utils.book_append_sheet(groupedWorkbook, groupedWorksheet, "Grouped Results");
-      XLSX.writeFile(groupedWorkbook, "grouped_results.xlsx");
+      if (Array.isArray(allResults) && typeof groupedResults === 'object') {
+        const allWorksheet = XLSX.utils.json_to_sheet(allResults);
+        
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, allWorksheet, "All Results");
 
-      console.log("Files processed successfully.");
+        Object.keys(groupedResults).forEach(groupKey => {
+          const groupData = groupedResults[groupKey];
+          const groupWorksheet = XLSX.utils.json_to_sheet(groupData);
+          XLSX.utils.book_append_sheet(workbook, groupWorksheet, groupKey);
+        });
+
+        downloadFile(workbook, "results.xlsx");
+
+        console.log("Files processed successfully.");
+      } else {
+        console.error("Invalid data format received from the server.");
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Error uploading files:", error.response?.data);
