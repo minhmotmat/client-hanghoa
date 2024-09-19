@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import * as XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 
 const FileUpload: React.FC = () => {
   const [files, setFiles] = useState({
@@ -17,16 +17,9 @@ const FileUpload: React.FC = () => {
   };
 
   const downloadFile = (workbook: XLSX.WorkBook, fileName: string) => {
-    // Write workbook to binary string
-    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-
-    // Create a Blob from the binary string
-    const blob = new Blob([wbout], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    // Create a link and trigger the download
-    const link = document.createElement("a");
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
     document.body.appendChild(link);
@@ -43,25 +36,20 @@ const FileUpload: React.FC = () => {
     if (files.dathang) formData.append("dathang", files.dathang);
 
     try {
-      const response = await axios.post(
-        "https://server-hanghoa.onrender.com:10000/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       const { allResults, groupedResults } = response.data;
 
-      if (Array.isArray(allResults) && typeof groupedResults === "object") {
+      if (Array.isArray(allResults) && typeof groupedResults === 'object') {
         const allWorksheet = XLSX.utils.json_to_sheet(allResults);
-
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, allWorksheet, "All Results");
 
-        Object.keys(groupedResults).forEach((groupKey) => {
+        Object.keys(groupedResults).forEach(groupKey => {
           const groupData = groupedResults[groupKey];
           const groupWorksheet = XLSX.utils.json_to_sheet(groupData);
           XLSX.utils.book_append_sheet(workbook, groupWorksheet, groupKey);
