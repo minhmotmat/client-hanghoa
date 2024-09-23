@@ -36,7 +36,7 @@ const FileUpload: React.FC = () => {
     if (files.dathang) formData.append("dathang", files.dathang);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
