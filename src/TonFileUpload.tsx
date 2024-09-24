@@ -22,7 +22,7 @@ const TonFileUpload = () => {
         formData.append('file', file);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/upload-tonkho`, {
+            const response = await fetch(`/api/upload-tonkho`, {
                 method: 'POST',
                 body: formData,
             });
