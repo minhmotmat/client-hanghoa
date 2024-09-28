@@ -1,6 +1,7 @@
 import React from "react";
 import FileUpload from "./FileUpload";
 import TonFileUpload from "./TonFileUpload";
+import DatHang from "./DatHang"; // Import the new component
 
 const App: React.FC = () => {
   return (
@@ -11,7 +12,10 @@ const App: React.FC = () => {
       </div>
       <div>
         <h1>Upload Tồn Kho</h1>
-        <TonFileUpload/>
+        <TonFileUpload />
+      </div>
+      <div>
+        <DatHang /> {/* Include the new component for uploading BTCH and BCTK */}
       </div>
     </>
   );

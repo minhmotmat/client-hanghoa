@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 const TonFileUpload = () => {
     const [file, setFile] = useState<File | null>(null);
-
+    const isProduction = import.meta.env.MODE === 'production';
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
@@ -20,7 +20,7 @@ const TonFileUpload = () => {
 
         const formData = new FormData();
         formData.append('file', file);
-
+        
         try {
             const response = await fetch(`/api/upload-tonkho`, {
                 method: 'POST',
