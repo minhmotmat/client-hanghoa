@@ -8,7 +8,7 @@ const FileUpload: React.FC = () => {
     output: null as File | null,
     dathang: null as File | null,
   });
-
+  const isProduction = import.meta.env.MODE === "production";
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = event.target;
     if (files && files.length > 0) {
@@ -36,9 +36,11 @@ const FileUpload: React.FC = () => {
     if (files.barcodes) formData.append("barcodes", files.barcodes);
     if (files.output) formData.append("output", files.output);
     if (files.dathang) formData.append("dathang", files.dathang);
-
+    const api = isProduction
+      ? `/api/upload`
+      : `${import.meta.env.VITE_API_URL}/upload`;
     try {
-      const response = await axios.post(`api/upload`, formData, {
+      const response = await axios.post(api, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
